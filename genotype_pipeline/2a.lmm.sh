@@ -26,11 +26,7 @@ path='/scratch/user/justen/stitch'
 geno='$2'
 
 ## prep
-#mkdir full_stitch
 cd full_stitch
-
-#mkdir \$geno
-#cd \$geno
 
 mkdir "$prefix"_fuller_dir
 cd "$prefix"_fuller_dir
