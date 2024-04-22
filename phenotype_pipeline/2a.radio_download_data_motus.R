@@ -149,45 +149,6 @@ df.alltags %>%
   filter(n > 1)
 
 #############################################################################################
-
-
-
-# location of tag deployments
-na.lakes <- map_data(map = "lakes")
-na.lakes <- mutate(na.lakes, long = long - 360)
-
-# Include all of the Americas to begin
-na.map <- map_data(map = "world2")
-na.map <- filter(na.map, region %in% c("Canada", "USA", "Mexico"))
-
-na.map <- mutate(na.map, long = long- 360)
-
-################################################################################################
-
-# map the location of tag deployments for the sample data
-
-xmin <- min(df.tagDeps$longitude, na.rm = TRUE) - 5
-xmax <- max(df.tagDeps$longitude, na.rm = TRUE) + 5
-ymin <- min(df.tagDeps$latitude, na.rm = TRUE) - 5
-ymax <- max(df.tagDeps$latitude, na.rm = TRUE) + 5
-
-###############################################################################################
-# Map 
-library(mapproj)
-
-ggplot(data = na.lakes, aes(x = long, y = lat)) + 
-  geom_polygon(data = na.map, aes(long, lat, group = group), 
-               colour = "grey", fill="grey98") + 
-  geom_polygon(aes(group = group), colour = "grey", fill = "white") +
-  coord_map(projection = "mercator", 
-            xlim = c(xmin, xmax), 
-            ylim = c(ymin, ymax)) +
-  labs(x = "", y = "") + 
-  theme_bw() + 
-  geom_point(data = filter(df.tagDeps, projectID == 280), 
-             aes(longitude, latitude), size = 2, shape = 1, colour = "red")
-
-
 # range of metadata
 df.tagDeps %>%
   select(tagID, projectID, tsStart, tsEnd, speciesID, latitude, longitude) %>%
@@ -204,10 +165,8 @@ tbl.species %>%
   as.data.frame()
 
 ###############################################################################################
-#parts missing
 
 tbl.recvDeps <- tbl(sql.motus, "recvDeps") 
-
 
 df.projRecvs <- tbl.recvDeps %>%
   filter(projectID == proj.num) %>%
@@ -229,72 +188,6 @@ df.projRecvs.long <- df.projRecvs %>%
   tidyr::gather(when, ts, c(tsStart, tsEnd)) %>%
   # fake end date:
   mutate(ts = if_else(is.na(ts), max(ts, na.rm = TRUE) + duration(1, "month"), ts)) 
-
-ggplot(data = df.projRecvs.long, 
-       aes(x = ts, y = as.factor(deviceID), colour = as.factor(deployID))) +
-  theme(legend.position = "none") +
-  geom_line(lwd = 3) + 
-  # instead, centre to the right
-  geom_text(data = filter(df.projRecvs.long, when == "tsStart"), 
-            aes(label = deployID), hjust = "left", nudge_y = 0.2, size = 3, angle = 45) +
-  theme_bw() +
-  labs(x = "Year", y = "Receiver ID")
-
-ggplot(data = df.projRecvs.long, 
-       aes(x = yday(ts), y = as.factor(deviceID), colour = as.factor(deployID))) +
-  theme_bw() +
-  theme(legend.position = "none") + 
-  geom_line(lwd = 3) + 
-  # centre labels to the left
-  geom_text(data = filter(df.projRecvs.long, when == "tsStart"), 
-            aes(label = deployID), hjust = "left", nudge_y = 0.4, size = 3) +
-  labs(x = "Day of year", y = "Receiver ID") +
-  facet_grid(year(ts) ~ ., scales = "free")
-
-
-# Location of receiver deployments
-
-df.recvDeps <- tbl.recvDeps %>%
-  collect() %>%
-  as.data.frame() %>%
-  mutate(tsStart = as_datetime(tsStart, tz = "UTC", origin = "1970-01-01"),
-         tsEnd = as_datetime(tsEnd, tz = "UTC", origin = "1970-01-01"))
-
-ggplot(data = na.lakes, aes(x = long, y = lat)) + 
-  theme_bw() + 
-  geom_polygon(data = na.map, aes(long, lat, group = group), 
-               colour = "grey", fill = "grey98") +
-  geom_polygon(aes(group = group), colour = "grey", fill = "white") +
-  coord_map(projection = "mercator", xlim = c(xmin, xmax), ylim = c(ymin, ymax)) +
-  labs(x = "", y = "") + 
-  geom_point(data = df.recvDeps, 
-             aes(longitude, latitude, colour = as.logical(projectID == 280)), 
-             size = 0.8, shape = 4) +
-  scale_colour_manual(values = c("grey30", "red"), name = "Project 280 Deployment")
-
-#######
-
-xmin <- min(df.projRecvs$longitude, na.rm = TRUE) - 20
-xmax <- max(df.projRecvs$longitude, na.rm = TRUE) + 20
-ymin <- min(df.projRecvs$latitude, na.rm = TRUE) - 10
-ymax <- max(df.projRecvs$latitude, na.rm = TRUE) + 10
-
-# xmin <- min(df.projRecvs$longitude, na.rm = TRUE) - 5
-# xmax <- max(df.projRecvs$longitude, na.rm = TRUE) + 5
-# ymin <- min(df.projRecvs$latitude, na.rm = TRUE) - 5
-# ymax <- max(df.projRecvs$latitude, na.rm = TRUE) + 5
-
-#######
-
-# map
-ggplot(data = na.lakes, aes(x = long, y = lat))+ 
-  theme_bw() + 
-  geom_polygon(data = na.map, aes(long, lat, group = group), colour = "grey", fill = "grey98") +
-  geom_polygon(aes(group = group), colour = "grey", fill = "white") +
-  coord_map(projection = "mercator", xlim = c(xmin, xmax), ylim = c(ymin, ymax)) +
-  labs(x = "", y = "") +
-  geom_point(data = filter(df.projRecvs, !is.na(latitude), !is.na(deviceID)), aes(longitude, latitude, colour = as.factor(name)), size = 2, shape = 1)+
-  scale_colour_discrete(name = "Receiver") 
 
 ###############################################################################################
 
@@ -351,15 +244,6 @@ filter(tbl_filtered, runLen <= 3) %>% collect() %>% nrow()
           year = year(ts), # extract year from ts
           doy = yday(ts)) %>% # extract numeric day of year from ts
    filter(!is.na(recvDeployLat))
- 
- 
- # just wanted to test if that worked
- #test_df<-subset(test,test$probability ==1)
- #test_df0<-subset(test,test$probability ==0)
- write.csv(df.alltags.sub_year, "./df.alltags_filter_run3_2023.csv", row.names = F)
-# 
-# tbl_strict <- filterByActivity(sql.motus, minLen = 4, maxLen = 10,
-#                                maxRuns = 50, ratio = 0.75, return = "all")
 
 ###############################################################################################
 ###############################################################################################
