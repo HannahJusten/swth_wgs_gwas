@@ -43,28 +43,12 @@ for(i in 1:length(files)){
   df.sub<-df.i[!is.na(df.i$migratory_leg),]
   
   id=gsub("_.*$","",files[i])
-# 
-#   pdf(paste("C:/Users/hcjusten/Dropbox/PhD/Thesis/Chapter_2/Analysis/Motus/data/july2_2021/after_manual_plots/",id,"_track_after_manual_filter.pdf",sep=""))
-#   print(ggmap(gmap) +
-#     theme_bw() +
-#     geom_point(data = df.sub, aes(x = tagDepLon, y = tagDepLat),
-#            shape = 21, colour = "black", fill = "black") +
-#     geom_point(data = df.sub, aes(x = recvDeployLon, y = recvDeployLat),
-#            shape = 21, colour = "black", fill = "yellow") +
-#     geom_path(data = df.sub,
-#           aes(x = recvDeployLon, y = recvDeployLat, group = motusTagID, col = "red")))
-#   dev.off()
     
   df_new<-rbind(df_new,df.sub)
   
 }
-  
 
-#test<-subset(df_new, df_new$recvDeployLon>-75)
-#test<-subset(test,test$recvDeployName!="deployment_loc")
-#unique(test$motusTagID)
 
-  #pdf(paste("C:/Users/hcjusten/Dropbox/PhD/Thesis/Chapter_2/Analysis/Motus/data/july2_2021/after_manual_plots/all_track_after_manual_filter.pdf",sep=""))  
   ggmap(gmap) +
     theme_bw() +
     geom_point(data = df_new, aes(x = tagDepLon, y = tagDepLat),
@@ -73,7 +57,7 @@ for(i in 1:length(files)){
            shape = 21, colour = "black", fill = "yellow") +
     geom_path(data = df_new,
           aes(x = recvDeployLon, y = recvDeployLat, group = motusTagID, col = "red"))
-  #dev.off()
+
   
   x<--122.885346
 
@@ -360,17 +344,7 @@ time_all<-merge(time_all,tes6_sub,by="motusTagID",all.x=T,all.y=T)
 
 write.csv(time_all, "C:/Users/hcjusten/Dropbox/PhD/Thesis/Chapter_2/Analysis/GWAS/meta_data/radio_timing_raw.csv", row.names=F)
 
-write.csv(time_all, "C:/Users/hcjusten/Dropbox/PhD/Thesis/Chapter_2/Analysis/GWAS/meta_data/spring_ids_radio.csv", row.names=F)
-
-
-
-
-
  #get bearings for each location for each ring separately
- 
-
-
- 
  
  df1_df<-df1_df[!is.na(df1_df$recvDeployLat),]
  df1_df<- df1_df[!is.na( df1_df$tagDepLat),]
@@ -683,16 +657,6 @@ fall_final<-merge(fall_final,fa_bear4,by="id",all.x=T,all.y=T)
 fall_final<-merge(fall_final,fa_bear5,by="id",all.x=T,all.y=T)
 
 fall_final<-merge(fall_final,fa_bear6,by="id",all.x=T,all.y=T)
-
- #the correlation doesn't seem to work, probably because there is 
-
-
-#library(corrgram)
- 
- #test<-cor(fall_final)
- 
- 
- #cor(fall_final$qnorm_fall_bear_1,fall_final$qnorm_fall_bear_2)
  
  write.csv(fall_final,"C:/Users/hcjusten/Dropbox/PhD/Thesis/Chapter_2/Analysis/GWAS/meta_data/radio_fall_bearing_qnorm.csv",row.names=F)
  
