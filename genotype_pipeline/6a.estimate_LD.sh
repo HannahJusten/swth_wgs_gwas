@@ -12,7 +12,7 @@ module load GCC/9.3.0 iccifort/2019.5.281 VCFtools/0.1.16
 
 path='/scratch/user/justen/stitch'
 
-cd ./full_stitch/bear_fall_300km_ref_fuller_dir/output
+#run script for locations on each scaffold separately
 
 vcftools \
 --gzvcf /scratch/user/justen/survival_gwas/stitch_survival_0.05.vcf.gz \
