@@ -383,9 +383,6 @@ df.alltags.sub <- tbl_relaxed %>%
 
 df.alltags.sub$probability[is.na(df.alltags.sub$probability)]<-1
 
-# just wanted to test if that worked
-#test_df<-subset(test,test$probability ==1)
-#test_df0<-subset(test,test$probability ==0)
 write.csv(df.alltags.sub, "./df.alltags_nov_2021.csv")
 
 df.alltags.sub_year <- df.alltags.sub %>%
@@ -393,31 +390,6 @@ df.alltags.sub_year <- df.alltags.sub %>%
          year = year(ts), # extract year from ts
          doy = yday(ts)) %>% # extract numeric day of year from ts
   filter(!is.na(recvDeployLat))
-
-# does the dataset not have GPS data?
-# because I am running into issues
-
-# Problem with `mutate()` input `gpsID`.
-# x can only subtract from "POSIXt" objects
-# i Input `gpsID` is `purrr::map_int(...)`.
-# Backtrace:
-#   1. motus::getGPS(sql.motus, data = df.alltags.sub, by = "closest")
-# 14. base::.handleSimpleError(...)
-# 15. dplyr:::h(simpleError(msg, call))
-# Run `rlang::last_trace()` to see the full context.
-
-# Retrieve GPS data for each hitID
-gps_index <- getGPS(sql.motus, data = df.alltags.sub, by = "closest")
-
-# Merge GPS points in with our data
-df.alltags.sub <- left_join(df.alltags.sub, gps_index, by = "hitID")
-
-
-
-# the next code did not work:
-# Error: Can't subset columns that don't exist.
-# x Column `gpsLat` doesn't exist.
-# Run `rlang::last_error()` to see where the error occurred.
 
 df.alltags <- tbl_relaxed %>%
   mutate(recvLat = if_else((is.na(gpsLat)|gpsLat == 0|gpsLat == 999),
@@ -441,8 +413,6 @@ df.alltags <- tbl_relaxed %>%
                                   paste(recvLat, recvLon, sep=":"),
                                   recvDeployName))
 
-
-
 df.alltags$probability[is.na(df.alltags$probability)]<-1
 df.alltags.sub_recv <- filter(df.alltags, probability == 1)
 
@@ -452,25 +422,7 @@ df.alltags.sub$probability[is.na(df.alltags.sub$probability)]<-1
 
 # full dataset, with relaxed probability values column
 
-saveRDS(df.alltags, "./df_alltags_#280_2Apr2021.rds")  
-
 saveRDS(df.alltags, "./df_alltags_#280_nov2021.rds") 
-
-# and subsetted dataset with relaxed filtering
-
-saveRDS(df.alltags.sub, "./df_alltags_relaxed#280_13Jul2020.rds")
-
-saveRDS(df.alltags.sub, "./df_alltags_relaxed#280_Jan2022.rds")
-
-
-write.csv(df.alltags.sub, "./df_alltags_sub_Jan_2022.csv")
-
-write.csv(df.alltags, "./df_alltags_second_output_nov_2021.csv")
-
-df.alltags<-read.csv("./october_2020/new/df_alltags#280_nov2020.csv")
-
-# reads in your file "df.alltags.rds" saved in the data folder
-#df.alltags.saved <- readRDS("./df_alltags#280_02Dec2019.rds") 
 
 ###############################################################################################
 ###############################################################################################
