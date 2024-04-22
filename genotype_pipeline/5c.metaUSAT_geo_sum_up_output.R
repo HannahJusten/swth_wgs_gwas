@@ -22,8 +22,7 @@ R<-cor.tetrachor(dat_final) # I decided to runn the subset rows with the values 
 
 ############### subsetting data to run things faster ###############
 
-
-dat1mio<-head(dat_final, 500000)
+dat1mio<-dat_final[1:nrow(dat_final),]
 
 results<-data.frame()
 
@@ -36,6 +35,6 @@ df<-data.frame(res)
 results<-rbind(results,df)
 }
 
-write.csv(results, "./results_geo_gwas_1.csv",row.names=F)
+write.csv(results, "./results_geo_gwas.csv",row.names=F)
 
 ###############
