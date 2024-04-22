@@ -28,7 +28,6 @@ getAttributeField <- function (x, field, attrsep = ";") {
   })
 }
 
-
 gffRead <- function(gffFile, nrows = -1) {
   cat("Reading ", gffFile, ": ", sep="")
   gff = read.table(gffFile, sep="\t", as.is=TRUE, quote="",
@@ -51,9 +50,7 @@ gff <- gffToGRanges("/scratch/user/delmore/annotation/agat/GCF_009819885.2_bCatU
 
 #read.delim("C:/Users/hcjusten/Downloads/fall_bear_archival_5_ldblock.gff", header=F, comment.char="#") -> gff
 
-
 #gff.genes <- gff[gff[,2]=="gene",]
-
 
 gff_rnas <- subset(gff,type %in% c("mRNA","guide_RNA","lnc_RNA","snoRNA","tRNA"))
 
